@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">MainProject</string>
+    <string name="action_settings">Settings</string>
+    <string name="event_name">Enter Name for Event Here!</string>
+    <string name="option_beacon_proximity">On Beacon Proximity</string>
+    <string name="repeat_alarm_switch">Repeat Alarm</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_event">Add Event</string>
+    <string name="and_time">End time!</string>
+    <string name="select_date">Select Date</string>
+    <string name="start_time">Start Time</string>
+    <string-array name="profile_name">
+        <item>Silent</item>
+        <item>Vibrate Mode</item>
+        <item>Ringer Mode</item>
+    </string-array>
+</resources>

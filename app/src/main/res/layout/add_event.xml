@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <EditText
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/event_name"
+            android:inputType="text"
+            android:hint="@string/event_name"
+            android:textSize="18sp"
+            android:layout_marginTop="40dp" />
+
+        <Spinner
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/profile_spinner" />
+
+        <Switch
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:text="@string/option_beacon_proximity"
+            android:id="@+id/beacon_toggle"
+            android:layout_marginTop="20dp"
+            android:textSize="18sp" />
+
+        <Spinner
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/beacon_spinner"
+            android:layout_marginTop="20dp"
+            android:visibility="gone" />
+
+        <Switch
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:text="@string/repeat_alarm_switch"
+            android:id="@+id/repeat_info"
+            android:layout_marginTop="20dp"
+            android:textSize="18sp" />
+
+        <EditText
+            android:layout_height="wrap_content"
+            android:inputType="date"
+            android:hint="@string/select_date"
+            android:ems="10"
+            android:id="@+id/editDate"
+            android:layout_width="145dp"
+            android:focusable="false" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/date_time_layout"
+            android:gravity="center">
+
+            <EditText
+                android:layout_height="wrap_content"
+                android:inputType="time"
+                android:hint="@string/start_time"
+                android:ems="10"
+                android:focusable="false"
+                android:id="@+id/from_time"
+                android:layout_width="145dp" />
+
+            <EditText
+                android:layout_height="wrap_content"
+                android:inputType="time"
+                android:hint="@string/and_time"
+                android:ems="10"
+                android:focusable="false"
+                android:id="@+id/to_time"
+                android:layout_width="145dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/days_linear_layout"
+            android:layout_marginTop="20dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:visibility="gone">
+
+            <ToggleButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:textColor="@color/toggle_color"
+                android:text=""
+                android:textOn="Mo"
+                android:textOff="Mo"
+                android:background="@drawable/days_selector"
+                android:id="@+id/toggleButtonMon" />
+            <ToggleButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:textColor="@color/toggle_color"
+                android:text=""
+                android:textOn="Tu"
+                android:textOff="Tu"
+                android:background="@drawable/days_selector"
+                android:id="@+id/toggleButtonTue"
+                android:layout_marginLeft="5dp" />
+            <ToggleButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:textColor="@color/toggle_color"
+                android:text=""
+                android:textOn="We"
+                android:textOff="We"
+                android:background="@drawable/days_selector"
+                android:id="@+id/toggleButtonWed"
+                android:layout_marginLeft="5dp" />
+            <ToggleButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:textColor="@color/toggle_color"
+                android:text=""
+                android:textOn="Th"
+                android:textOff="Th"
+                android:background="@drawable/days_selector"
+                android:id="@+id/toggleButtonThu"
+                android:layout_marginLeft="5dp" />
+            <ToggleButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:textColor="@color/toggle_color"
+                android:text=""
+                android:textOn="Fr"
+                android:textOff="Fr"
+                android:background="@drawable/days_selector"
+                android:id="@+id/toggleButtonFri"
+                android:layout_marginLeft="5dp" />
+            <ToggleButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:textColor="@color/toggle_color"
+                android:text=""
+                android:textOn="Sa"
+                android:textOff="Sa"
+                android:background="@drawable/days_selector"
+                android:id="@+id/toggleButtonSat"
+                android:layout_marginLeft="5dp" />
+            <ToggleButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:textColor="@color/toggle_color"
+                android:text=""
+                android:textOn="Su"
+                android:textOff="Su"
+                android:background="@drawable/days_selector"
+                android:id="@+id/toggleButtonSun"
+                android:layout_marginLeft="5dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/transparent_color"
+            android:textColor="@color/colorPrimaryDark"
+            android:text="@string/cancel"
+            android:id="@+id/event_cancel" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/add_event"
+            android:background="@color/colorPrimaryDark"
+            android:textColor="#FFFFFF"
+            android:id="@+id/event_submit"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+
+</LinearLayout>
