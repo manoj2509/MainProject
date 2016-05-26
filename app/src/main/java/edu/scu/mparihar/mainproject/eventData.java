@@ -1,9 +1,11 @@
 package edu.scu.mparihar.mainproject;
 
+import java.io.Serializable;
+
 /**
  * Created by Mj on 24-May-16.
  */
-public class eventData {
+public class eventData implements Serializable{
     String name;
     String profile, beaconId, startTime, endTime, date, repeatArray;
     boolean repeatFlag;

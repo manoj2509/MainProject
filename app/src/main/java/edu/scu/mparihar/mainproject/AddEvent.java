@@ -35,6 +35,7 @@ import java.util.Locale;
 public class AddEvent extends AppCompatActivity {
 
     // Default variables.
+    eventData eventObject;
     ArrayList<String> profiles = new ArrayList<>();
     ArrayList<String> beacons = new ArrayList<>();
     EditText eventName, editDate, toTime, fromTime;
@@ -266,7 +267,7 @@ public class AddEvent extends AppCompatActivity {
         event_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                eventData eventObject = new eventData();
+                eventObject = new eventData();
                 eventObject.setName(eventName.getText().toString());                                // 1
                 int flag = 0;
                 eventObject.setStartTime(fromTime.getText().toString());                            // 2
@@ -334,9 +335,9 @@ public class AddEvent extends AppCompatActivity {
 
                 if (flag == 0) {
                     Intent resultIntent = new Intent();
-                    resultIntent.putExtra("Object", (Serializable) eventObject);
-
+                    resultIntent.putExtra("Object",eventObject);
                     setResult(Activity.RESULT_OK, resultIntent);
+                    finish();
                 }
 
             }

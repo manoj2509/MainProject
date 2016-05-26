@@ -89,7 +89,7 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
 
         }
 
-        return 0;
+        return id;
     }
 
 
