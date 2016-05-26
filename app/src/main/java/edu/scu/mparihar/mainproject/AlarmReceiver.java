@@ -13,6 +13,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
          eventData ed = (eventData) intent.getSerializableExtra("v");
 
+
         Toast.makeText(context, "Alarm Triggered "+ ed.getName(), Toast.LENGTH_LONG).show();
 
     }

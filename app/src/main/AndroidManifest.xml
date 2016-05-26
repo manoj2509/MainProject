@@ -24,6 +24,10 @@
             android:parentActivityName=".MainActivity">
         </activity>
 
+        <activity android:name=".AddProfile"
+            android:label="Add an Profile!">
+        </activity>
+
         <receiver android:name=".AlarmReceiver"/>
 
     </application>
