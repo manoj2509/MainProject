@@ -19,13 +19,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddEvent"
+        <activity
+            android:name=".AddEvent"
             android:label="Add an Event!"
             android:parentActivityName=".MainActivity">
         </activity>
 
-        <activity android:name=".AddProfile"
-            android:label="Add an Profile!">
+        <activity
+            android:name=".AddProfile"
+            android:label="Add a Profile!"
+            android:parentActivityName=".MainActivity">
         </activity>
 
         <receiver android:name=".AlarmReceiver"/>

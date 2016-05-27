@@ -34,7 +34,13 @@ public class ProfileRecyclerViewAdapter extends RecyclerView.Adapter<ProfileRecy
         holder.entryName.setText(profileData1.getName());
         // TODO check conditions and print accordingly.
 
-        holder.entryType.setImageResource(R.drawable.ic_volume_off_50dp);
+        if (profileData1.getType().equals("Silent")) {
+            holder.entryType.setImageResource(R.drawable.ic_volume_off_50dp);
+        } else if (profileData1.getType().equals("Vibrate Mode")) {
+            holder.entryType.setImageResource(R.drawable.ic_vibration_24dp);
+        } else {
+            holder.entryType.setImageResource(R.drawable.ic_volume_up_50dp);
+        }
     }
 
     @Override

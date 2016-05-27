@@ -9,7 +9,8 @@
         android:layout_height="50dp"
         android:id="@+id/profile_list_type"
         android:contentDescription="@string/type_image"
-        android:layout_gravity="center_vertical" />
+        android:layout_gravity="center_vertical"
+        android:padding="8dp" />
 
     <TextView
         android:layout_width="0dp"
