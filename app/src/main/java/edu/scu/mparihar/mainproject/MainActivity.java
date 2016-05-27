@@ -185,8 +185,8 @@ public class MainActivity extends AppCompatActivity implements Serializable {
             if (requestCode == 1) {
                 if (resultCode == RESULT_OK) {
                     // get object, put to database, notify data-set changed
-//                    ed = (EventData) data.getParcelableExtra("Object");
-                    ed = (EventData) data.getSerializableExtra("Object");
+                    ed = (EventData) data.getParcelableExtra("Object");
+//                    ed = (EventData) data.getSerializableExtra("Object");
 
                     long r = eventDbHelper.insertData(ed.getName(), ed.getProfile(), ed.getBeaconId(), ed.getStartTime(), ed.getEndTime(), ed.getDate(), ed.getRepeatArray(), ed.getRepeatFlag());
                     Toast.makeText(this,  Integer.toString((int)r), Toast.LENGTH_LONG).show();
