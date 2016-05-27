@@ -64,15 +64,15 @@ public class AddProfile extends AppCompatActivity {
                 if (currentSelection[0].equals("Silent")) {
                     volumeSeekbar.setProgress(0);
                     volumeSeekbar.setEnabled(false);
-                    ringtoneButton.setVisibility(View.GONE);
+                    ringtoneButton.setEnabled(false);
                 }
                 if (currentSelection[0].equals("Vibrate Mode")) {
                     volumeSeekbar.setEnabled(false);
-                    ringtoneButton.setVisibility(View.GONE);
+                    ringtoneButton.setEnabled(false);
                 }
                 if (currentSelection[0].equals("Ringer Mode")) {
                     volumeSeekbar.setEnabled(true);
-                    ringtoneButton.setVisibility(View.VISIBLE);
+                    ringtoneButton.setEnabled(true);
                 }
             }
 

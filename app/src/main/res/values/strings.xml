@@ -20,6 +20,7 @@
     <string name="tap_to_select_ringtone">TAP TO SELECT RINGTONE</string>
     <string name="volume_cannot_be_0_at_ringer_mode">Volume cannot be 0 at ringer mode!</string>
     <string name="select_a_rongtone">Select a Rongtone!</string>
+    <string name="select_volume">Select Volume:</string>
     <string-array name="profile_name">
         <item>Silent</item>
         <item>Vibrate Mode</item>
