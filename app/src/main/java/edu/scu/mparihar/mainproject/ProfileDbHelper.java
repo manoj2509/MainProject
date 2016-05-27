@@ -128,4 +128,36 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
         }
         return toSend;
     }
+
+
+    public String getRowData( String[] profile_name) {
+        String send = null;
+        SQLiteDatabase db = getReadableDatabase();
+        String[] columns = {UID, PROFILENAME, TYPE, RINGTONE,VOLUME};
+        try {
+            Cursor cursor = db.query(TABLE_NAME, columns, PROFILENAME+"= ? ", profile_name, null,null,null);
+            int size = cursor.getCount();
+            StringBuffer buffer = new StringBuffer();
+
+            while (cursor.moveToNext()) {
+
+                int id = cursor.getInt(0);
+                String pname = cursor.getString(1);
+                String type = cursor.getString(2);
+                String ring =cursor.getString(3);
+                int vol = cursor.getInt(4);
+                send = id +","+pname+","+type+","+ring+","+vol;
+
+            }
+
+
+        } catch (Exception e) {
+            Log.i("AllData", "getAllData: " + e.toString());
+            Toast.makeText(context, "getAllData: " + e.toString(), Toast.LENGTH_LONG).show();
+        }
+
+        return send;
+    }
+
+
 }

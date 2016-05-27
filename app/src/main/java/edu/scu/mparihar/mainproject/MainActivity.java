@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Calendar;
 
 
 public class MainActivity extends AppCompatActivity implements Serializable {
@@ -31,9 +32,9 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     EventData ed;
     ProfileData newData;
     Context context;
-    Intent intentAlarm;
-    AlarmManager alarmManager;
-    PendingIntent pendingIntent;
+    Intent intentAlarm,intentAlarm1;
+    AlarmManager alarmManager,alarmManager1;
+    PendingIntent pendingIntent,pendingIntent1;
     List<EventData> AllData = new ArrayList<>();
     List<ProfileData> AllProfiles = new ArrayList<>();
     private TabLayout tabLayout;
@@ -185,18 +186,26 @@ public class MainActivity extends AppCompatActivity implements Serializable {
             if (requestCode == 1) {
                 if (resultCode == RESULT_OK) {
                     // get object, put to database, notify data-set changed
-//                    ed = (EventData) data.getParcelableExtra("Object");
                     ed = (EventData) data.getSerializableExtra("Object");
-
-                    long r = eventDbHelper.insertData(ed.getName(), ed.getProfile(), ed.getBeaconId(), ed.getStartTime(), ed.getEndTime(), ed.getDate(), ed.getRepeatArray(), ed.getRepeatFlag());
+                    long r= eventDbHelper.insertData(ed.getName(), ed.getProfile(), ed.getBeaconId(), ed.getStartTime(), ed.getEndTime(), ed.getDate(), ed.getRepeatArray(), ed.getRepeatFlag());
                     Toast.makeText(this,  Integer.toString((int)r), Toast.LENGTH_LONG).show();
                     Date d = formatter.parse(ed.getDate());
 
                     String formatted = formatter.format(new Date());
                     // difference=(d.getTime()-formatter.parse(formatted).getTime());
+                    String[] units = ed.getStartTime().split(":"); //will break the string up into an array
+                    int hours = Integer.parseInt(units[0]); //first element
+                    int minutes = Integer.parseInt(units[1]); //second element
 
-                    long time = new GregorianCalendar().getTimeInMillis()+15*1000;
-
+                    Calendar c = Calendar.getInstance();
+                    c.setTimeInMillis(System.currentTimeMillis());
+                    //  c.set(Calendar.MONTH,d.getMonth());
+                    // c.set(Calendar.YEAR,d.getYear());
+                    //c.set(Calendar.DAY_OF_MONTH,d.getDay());
+                    c.set(Calendar.HOUR_OF_DAY,hours);
+                    c.set(Calendar.MINUTE,minutes);
+                    c.set(Calendar.SECOND,0);
+                    long time = new GregorianCalendar().getTimeInMillis();
 
                     // create an Intent and set the class which will execute when Alarm triggers, here we have
                     // given AlarmReciever in the Intent, the onRecieve() method of this class will execute when
@@ -206,21 +215,45 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                     intentAlarm.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 
                     intentAlarm.putExtra("v",ed);
-                    pendingIntent = PendingIntent.getBroadcast(this, (int)r, intentAlarm,0);
+                    pendingIntent = PendingIntent.getBroadcast(this, (int)r*2, intentAlarm,0);
 
                     // create the object
                     alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
                     //set the alarm for particular time
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+                    Toast.makeText(this, "Success" + time, Toast.LENGTH_LONG).show();
+
+                    //new intent
+
+                    String[] stop = ed.getEndTime().split(":"); //will break the string up into an array
+                    hours = Integer.parseInt(stop[0]); //first element
+                    minutes = Integer.parseInt(stop[1]); //second element
+
+                    c.set(Calendar.HOUR_OF_DAY,hours);
+                    c.set(Calendar.MINUTE,minutes);
+                    c.set(Calendar.SECOND,0);
+
+                    // create an Intent and set the class which will execute when Alarm triggers, here we have
+                    // given AlarmReciever in the Intent, the onRecieve() method of this class will execute when
+                    // alarm triggers and
+                    //we will write the code to send SMS inside onRecieve() method pf Alarmreciever class
+
+
+                    intentAlarm1 = new Intent(this, AlarmReceiver.class);
+                    intentAlarm1.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+
+                    intentAlarm1.putExtra("v",ed);
+                    pendingIntent1 = PendingIntent.getBroadcast(this, ((int)r*2)-1, intentAlarm1,0);
+
+                    // create the object
+                    alarmManager1 = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+                    //set the alarm for particular time
+                    alarmManager1.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent1);
                     //Toast.makeText(this, "Success" + time, Toast.LENGTH_LONG).show();
 
-                    // TODO
-                    AllData.add(ed);
-                    adapter.notifyDataSetChanged();
-                    viewPager.setAdapter(adapter);
 
-                    //set one more alarm for toggling back to the nonrmal mode
 
                 }
 
