@@ -17,7 +17,7 @@ import java.util.List;
 
 public class ProfileDbHelper extends SQLiteOpenHelper {
 
-    protected static final String DATABASE_NAME = "SmartNotifier.db";
+    protected static final String DATABASE_NAME = "SmartNotifier1.db";
     protected static final int DATABASE_VERSION = 1;
 
     protected static final String TABLE_NAME = "ProfileManager";
@@ -50,6 +50,7 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         try {
             db.execSQL(CREATE_TABLE);
+            Toast.makeText(context, "Database successfully created", Toast.LENGTH_LONG).show();
         } catch (android.database.SQLException e) {
             Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
         }
@@ -87,7 +88,6 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
         contentValues.put(TYPE, type);
         contentValues.put(RINGTONE, ringtone);
         contentValues.put(VOLUME, volume);
-
         long id = db.insert(TABLE_NAME, null, contentValues);
         if(id == -1) {
 

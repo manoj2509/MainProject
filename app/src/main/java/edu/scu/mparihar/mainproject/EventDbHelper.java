@@ -20,6 +20,7 @@ public class EventDbHelper extends SQLiteOpenHelper{
     protected static final String DATABASE_NAME = "SmartNotifier.db";
     protected static final int DATABASE_VERSION = 1;
     protected static final String TABLE_NAME = "EventManager";
+
     protected static final String UID = "_id";
     protected static final String NAME = "name";
     protected static final String PROFILE = "profile";
