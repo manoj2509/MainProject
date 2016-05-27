@@ -23,7 +23,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,7 +34,7 @@ import java.util.Locale;
 public class AddEvent extends AppCompatActivity {
 
     // Default variables.
-    eventData eventObject;
+    EventData eventObject;
     ArrayList<String> profiles = new ArrayList<>();
     ArrayList<String> beacons = new ArrayList<>();
     EditText eventName, editDate, toTime, fromTime;
@@ -267,7 +266,7 @@ public class AddEvent extends AppCompatActivity {
         event_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                eventObject = new eventData();
+                eventObject = new EventData();
                 eventObject.setName(eventName.getText().toString());                                // 1
                 int flag = 0;
                 eventObject.setStartTime(fromTime.getText().toString());                            // 2
@@ -280,7 +279,7 @@ public class AddEvent extends AppCompatActivity {
                     eventObject.setProfile(profile_spinner.getSelectedItem().toString());           // 4
                     if (beacon_toggle.isChecked()) {
                         eventObject.setBeaconId(beacon_spinner.getSelectedItem().toString());       // 5
-                        eventObject.setRepeatFlag(false);                                           // 6
+                        eventObject.setRepeatFlag(0);                                           // 6
                         eventObject.setDate("0");                                                   // 7
                         eventObject.setRepeatArray("");                                             // 8
                     } else {
@@ -294,7 +293,7 @@ public class AddEvent extends AppCompatActivity {
                             flag = 2;
                         }
                         if (repeat_info.isChecked()) {
-                            eventObject.setRepeatFlag(true);                                        // 6
+                            eventObject.setRepeatFlag(1);                                        // 6
                             // Get marked days.
                             StringBuilder stringBuilder = new StringBuilder();
                             int temp;
@@ -321,7 +320,7 @@ public class AddEvent extends AppCompatActivity {
 
 
                         } else {
-                            eventObject.setRepeatFlag(false);                                       // 6
+                            eventObject.setRepeatFlag(0);                                       // 6
                             eventObject.setDate(editDate.getText().toString());                     // 7
                             eventObject.setRepeatArray("");                                         // 8
                             if (eventObject.getDate().isEmpty()) {

@@ -9,6 +9,17 @@
     <string name="and_time">End time!</string>
     <string name="select_date">Select Date</string>
     <string name="start_time">Start Time</string>
+    <string name="your_events_will_line_up_here">Your Events will line up here</string>
+    <string name="loud">Loud</string>
+    <string name="time_sample">12:30 AM to 7:30 PM</string>
+    <string name="type_image">Type Image</string>
+    <string name="my_office_tone">My Office Tone</string>
+    <string name="profile_name">Profile Name</string>
+    <string name="save">Save</string>
+    <string name="select_ringtone">Select Ringtone</string>
+    <string name="tap_to_select_ringtone">TAP TO SELECT RINGTONE</string>
+    <string name="volume_cannot_be_0_at_ringer_mode">Volume cannot be 0 at ringer mode!</string>
+    <string name="select_a_rongtone">Select a Rongtone!</string>
     <string-array name="profile_name">
         <item>Silent</item>
         <item>Vibrate Mode</item>

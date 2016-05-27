@@ -11,7 +11,7 @@ import android.widget.Toast;
 public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-         eventData ed = (eventData) intent.getSerializableExtra("v");
+         EventData ed = (EventData) intent.getSerializableExtra("v");
 
 
         Toast.makeText(context, "Alarm Triggered "+ ed.getName(), Toast.LENGTH_LONG).show();

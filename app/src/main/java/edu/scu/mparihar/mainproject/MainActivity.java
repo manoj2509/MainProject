@@ -3,12 +3,13 @@ package edu.scu.mparihar.mainproject;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,30 +17,35 @@ import android.widget.Toast;
 import android.app.AlarmManager;
 import java.io.Serializable;
 import android.app.PendingIntent;
-import java.util.Calendar;
+
+import java.util.ArrayList;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.Date;
-
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements Serializable {
 
-    eventData ed;
+    EventData ed;
+    ProfileData newData;
     Context context;
     Intent intentAlarm;
     AlarmManager alarmManager;
     PendingIntent pendingIntent;
-
+    List<EventData> AllData = new ArrayList<>();
+    List<ProfileData> AllProfiles = new ArrayList<>();
     private TabLayout tabLayout;
     SimpleDateFormat formatter = new SimpleDateFormat("mm/dd/yy");
     EventDbHelper eventDbHelper;
+    ProfileDbHelper profileDbHelper;
     private ViewPager viewPager;
     private int[] tabIcons = {
             R.drawable.ic_assignment_24dp,
             R.drawable.ic_assignment_ind_24dp
     };
+    ViewPagerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +54,9 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         context = this;
+
         eventDbHelper =  new EventDbHelper(context);
+        profileDbHelper = new ProfileDbHelper(context);
 
 
         FloatingActionButton fabEvent = (FloatingActionButton) findViewById(R.id.fabEvent);
@@ -73,8 +81,11 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         }
 
         // Extract from database.
-
-
+        AllData = eventDbHelper.getAllData();
+//        Log.v("Getting all data: ", AllData.get(0).getName());
+//        Log.v("Getting all data: ", AllData.get(1).getName());
+        AllProfiles = profileDbHelper.getAllProfiles();
+        Log.v("Accessing All Profiles ", String.valueOf(AllProfiles.size()));
 
         // Putting tabLayout
         TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
@@ -117,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         viewPager.addOnPageChangeListener(onPageChangeListener);    //To listen to any page changes.
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
+        assert tabLayout != null;
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setOnTabSelectedListener(onTabSelectedListener);  //To find which tab is selected.
         setupTabIcons();
@@ -128,10 +140,21 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        adapter.addFrag(new EventFragment(), "Dashboard");
-        adapter.addFrag(new ProfileFragment(), "Profiles");
+        Bundle b = new Bundle();
+        EventFragment eventFragment = new EventFragment();
+        b.putParcelableArrayList("EventData", (ArrayList<? extends Parcelable>) AllData);
+        eventFragment.setArguments(b);
+        Log.i("In MA: Sent bundle", String.valueOf(AllData.size()));
+        adapter.addFrag(eventFragment, "Dashboard");
+
+        Bundle p = new Bundle();
+        ProfileFragment profileFragment = new ProfileFragment();
+        p.putParcelableArrayList("ProfileData", (ArrayList<? extends Parcelable>) AllProfiles);
+        profileFragment.setArguments(p);
+        // TODO add data to this.
+        adapter.addFrag(profileFragment, "Profiles");
         viewPager.setAdapter(adapter);
     }
 
@@ -162,14 +185,15 @@ public class MainActivity extends AppCompatActivity implements Serializable {
             if (requestCode == 1) {
                 if (resultCode == RESULT_OK) {
                     // get object, put to database, notify data-set changed
-                    ed = (eventData) data.getSerializableExtra("Object");
+//                    ed = (EventData) data.getParcelableExtra("Object");
+                    ed = (EventData) data.getSerializableExtra("Object");
 
-                  long r= eventDbHelper.insertData(ed.getName(), ed.getProfile(), ed.getBeaconId(), ed.getStartTime(), ed.getEndTime(), ed.getDate(), ed.getRepeatArray(), ed.isRepeatFlag());
+                    long r = eventDbHelper.insertData(ed.getName(), ed.getProfile(), ed.getBeaconId(), ed.getStartTime(), ed.getEndTime(), ed.getDate(), ed.getRepeatArray(), ed.getRepeatFlag());
                     Toast.makeText(this,  Integer.toString((int)r), Toast.LENGTH_LONG).show();
                     Date d = formatter.parse(ed.getDate());
 
-                   String formatted = formatter.format(new Date());
-                   // difference=(d.getTime()-formatter.parse(formatted).getTime());
+                    String formatted = formatter.format(new Date());
+                    // difference=(d.getTime()-formatter.parse(formatted).getTime());
 
                     long time = new GregorianCalendar().getTimeInMillis()+15*1000;
 
@@ -185,13 +209,14 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                     pendingIntent = PendingIntent.getBroadcast(this, (int)r, intentAlarm,0);
 
                     // create the object
-                     alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                    alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
                     //set the alarm for particular time
                     alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
                     //Toast.makeText(this, "Success" + time, Toast.LENGTH_LONG).show();
 
-
+                    // TODO
+                    adapter.notifyDataSetChanged();
 
                     //set one more alarm for toggling back to the nonrmal mode
 
@@ -206,6 +231,13 @@ public class MainActivity extends AppCompatActivity implements Serializable {
             if (requestCode == 2) {
                 if (resultCode == RESULT_OK) {
                     // get object, put to database, notify data set changed.
+                    newData = data.getParcelableExtra("Profile");
+//                    newData = (ProfileData) data.getSerializableExtra("Profile");
+                    Log.v("After getting to insert", "Success");
+                    long r = profileDbHelper.insertData(newData.getName(), newData.getType(),
+                            newData.getRingtone(), newData.getVolume());
+                    Toast.makeText(this,  Integer.toString((int)r), Toast.LENGTH_LONG).show();
+                    adapter.notifyDataSetChanged();
                 }
                 if (resultCode == RESULT_CANCELED) {
 
