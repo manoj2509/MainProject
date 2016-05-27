@@ -216,7 +216,9 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                     //Toast.makeText(this, "Success" + time, Toast.LENGTH_LONG).show();
 
                     // TODO
+                    AllData.add(ed);
                     adapter.notifyDataSetChanged();
+                    viewPager.setAdapter(adapter);
 
                     //set one more alarm for toggling back to the nonrmal mode
 
@@ -237,7 +239,10 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                     long r = profileDbHelper.insertData(newData.getName(), newData.getType(),
                             newData.getRingtone(), newData.getVolume());
                     Toast.makeText(this,  Integer.toString((int)r), Toast.LENGTH_LONG).show();
+                    AllProfiles.add(newData);
                     adapter.notifyDataSetChanged();
+                    viewPager.setAdapter(adapter);
+
                 }
                 if (resultCode == RESULT_CANCELED) {
 
