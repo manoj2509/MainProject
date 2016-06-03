@@ -12,12 +12,12 @@ import java.util.List;
  * Created by Mj on 25-May-16.
  */
 public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.MyViewHolder> {
-    private List<EventData> EventData;
+    private List<EventData> eventDatas;
 
     public EventRecyclerViewAdapter(List<EventData> demoData) {
-        this.EventData = demoData;
+        this.eventDatas = demoData;
     }
-    // receive EventData objects here. Data required to be called outside here.
+    // receive eventDatas objects here. Data required to be called outside here.
     @Override
     public EventRecyclerViewAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
@@ -27,7 +27,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        EventData eventData1 = EventData.get(position);
+        EventData eventData1 = eventDatas.get(position);
         holder.entryName.setText(eventData1.getName());
         // TODO check conditions and print accordingly.
         String temp = eventData1.getStartTime() + " to " + eventData1.getEndTime();
@@ -36,8 +36,8 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
 
     @Override
     public int getItemCount() {
-//        Log.i("In Recycler Adapter", EventData.get(0).getName() + "::" + EventData.get(1).getName());
-        return EventData.size();
+//        Log.i("In Recycler Adapter", eventDatas.get(0).getName() + "::" + eventDatas.get(1).getName());
+        return eventDatas.size();
     }
 
     public final static class MyViewHolder extends RecyclerView.ViewHolder{

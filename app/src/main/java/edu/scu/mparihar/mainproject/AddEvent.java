@@ -42,6 +42,7 @@ public class AddEvent extends AppCompatActivity {
     Context context;
     Switch beacon_toggle, repeat_info;
     Spinner beacon_spinner;
+
     ToggleButton toggleButtonMon, toggleButtonTue, toggleButtonWed, toggleButtonThu,
             toggleButtonFri, toggleButtonSat, toggleButtonSun;
     Button event_cancel, event_submit;
@@ -90,10 +91,13 @@ public class AddEvent extends AppCompatActivity {
         Log.v("Main Activity", "onCreate: Set daytime to 0");
 
         // Getting spinner elements for Profile.
-        profiles.add("Silent");
-        profiles.add("Vibrate");
-        profiles.add("Loud");
-        profiles.add("Home");
+//        profiles.add("Silent");
+//        profiles.add("Vibrate");
+//        profiles.add("Loud");
+//        profiles.add("Home");
+
+        profiles = getIntent().getStringArrayListExtra("profiles");
+
         ArrayAdapter<String> profileAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, profiles);
         profile_spinner.setAdapter(profileAdapter);
         profile_spinner.setSelection(0);

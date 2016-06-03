@@ -35,12 +35,14 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     Intent intentAlarm,intentAlarm1;
     AlarmManager alarmManager,alarmManager1;
     PendingIntent pendingIntent,pendingIntent1;
-    List<EventData> AllData = new ArrayList<>();
-    List<ProfileData> AllProfiles = new ArrayList<>();
+    List<EventData> AllData;
+    List<ProfileData> AllProfiles;
+    List<String> ProfileNames;
     private TabLayout tabLayout;
     SimpleDateFormat formatter = new SimpleDateFormat("mm/dd/yy");
     EventDbHelper eventDbHelper;
     ProfileDbHelper profileDbHelper;
+
     private ViewPager viewPager;
     private int[] tabIcons = {
             R.drawable.ic_assignment_24dp,
@@ -56,8 +58,19 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         setSupportActionBar(toolbar);
         context = this;
 
+        AllData = new ArrayList<>();
+        AllProfiles = new ArrayList<>();
+        ProfileNames = new ArrayList<>();
         eventDbHelper =  new EventDbHelper(context);
         profileDbHelper = new ProfileDbHelper(context);
+
+        // Extract from database.
+        AllData = eventDbHelper.getAllData();
+//        Log.v("Getting all data: ", AllData.get(0).getName());
+//        Log.v("Getting all data: ", AllData.get(1).getName());
+        AllProfiles = profileDbHelper.getAllProfiles();
+
+        Log.v("Accessing All Profiles ", String.valueOf(AllProfiles.size()));
 
 
         FloatingActionButton fabEvent = (FloatingActionButton) findViewById(R.id.fabEvent);
@@ -66,6 +79,11 @@ public class MainActivity extends AppCompatActivity implements Serializable {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,AddEvent.class);
+                ProfileNames = new ArrayList<>();
+                for (int i = 0; i < AllProfiles.size(); i++) {
+                    ProfileNames.add(AllProfiles.get(i).getName());
+                }
+                intent.putStringArrayListExtra("profiles", (ArrayList<String>) ProfileNames);
                 startActivityForResult(intent, 1);
             }
         });
@@ -80,13 +98,6 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                 }
             });
         }
-
-        // Extract from database.
-        AllData = eventDbHelper.getAllData();
-//        Log.v("Getting all data: ", AllData.get(0).getName());
-//        Log.v("Getting all data: ", AllData.get(1).getName());
-        AllProfiles = profileDbHelper.getAllProfiles();
-        Log.v("Accessing All Profiles ", String.valueOf(AllProfiles.size()));
 
         // Putting tabLayout
         TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
@@ -186,15 +197,10 @@ public class MainActivity extends AppCompatActivity implements Serializable {
             if (requestCode == 1) {
                 if (resultCode == RESULT_OK) {
                     // get object, put to database, notify data-set changed
-<<<<<<< HEAD
-                    ed = (EventData) data.getSerializableExtra("Object");
-                    long r= eventDbHelper.insertData(ed.getName(), ed.getProfile(), ed.getBeaconId(), ed.getStartTime(), ed.getEndTime(), ed.getDate(), ed.getRepeatArray(), ed.getRepeatFlag());
-=======
                     ed = (EventData) data.getParcelableExtra("Object");
 //                    ed = (EventData) data.getSerializableExtra("Object");
 
-                    long r = eventDbHelper.insertData(ed.getName(), ed.getProfile(), ed.getBeaconId(), ed.getStartTime(), ed.getEndTime(), ed.getDate(), ed.getRepeatArray(), ed.getRepeatFlag());
->>>>>>> origin/master
+                    long r= eventDbHelper.insertData(ed.getName(), ed.getProfile(), ed.getBeaconId(), ed.getStartTime(), ed.getEndTime(), ed.getDate(), ed.getRepeatArray(), ed.getRepeatFlag());
                     Toast.makeText(this,  Integer.toString((int)r), Toast.LENGTH_LONG).show();
                     Date d = formatter.parse(ed.getDate());
 
@@ -222,6 +228,8 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                     intentAlarm.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 
                     intentAlarm.putExtra("v",ed);
+                    intentAlarm.putExtra("x","intent_start");
+
                     pendingIntent = PendingIntent.getBroadcast(this, (int)r*2, intentAlarm,0);
 
                     // create the object
@@ -229,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
 
                     //set the alarm for particular time
                     alarmManager.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
-                    Toast.makeText(this, "Success" + time, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(this, "Success" + time, Toast.LENGTH_LONG).show();
 
                     //new intent
 
@@ -251,6 +259,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                     intentAlarm1.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 
                     intentAlarm1.putExtra("v",ed);
+                    intentAlarm1.putExtra("x","intent_stop");
                     pendingIntent1 = PendingIntent.getBroadcast(this, ((int)r*2)-1, intentAlarm1,0);
 
                     // create the object
@@ -259,6 +268,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                     //set the alarm for particular time
                     alarmManager1.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent1);
                     //Toast.makeText(this, "Success" + time, Toast.LENGTH_LONG).show();
+
 
 
 
@@ -292,6 +302,12 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         catch (ParseException es) {
 
         }
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            AllData.add(ed);
+            adapter.notifyDataSetChanged();
+            viewPager.setAdapter(adapter);
+        }
+
 
     }
 

@@ -50,7 +50,13 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         try {
             db.execSQL(CREATE_TABLE);
-            Toast.makeText(context, "Database successfully created", Toast.LENGTH_LONG).show();
+            String uid = "Silent";
+//            String sql1 = "insert into " +TABLE_NAME+ " (" +PROFILENAME+ ", " +TYPE+ ") values(" +uid+  "," +uid+ ")";
+//            db.execSQL(sql1);
+
+//            insertData("Silent", "Silent", "", 0);
+//            insertData("Vibrate", "Vibrate Mode", "", 0);
+           // Toast.makeText(context, "Database successfully created", Toast.LENGTH_LONG).show();
         } catch (android.database.SQLException e) {
             Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
         }
@@ -60,6 +66,35 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
+    public String getRowData( String[] profile_name) {
+        String send = null;
+        SQLiteDatabase db = getReadableDatabase();
+        String[] columns = {UID, PROFILENAME, TYPE, RINGTONE,VOLUME};
+        try {
+            Cursor cursor = db.query(TABLE_NAME, columns, PROFILENAME+"= ? ", profile_name, null,null,null);
+            int size = cursor.getCount();
+            StringBuffer buffer = new StringBuffer();
+
+            while (cursor.moveToNext()) {
+
+                int id = cursor.getInt(0);
+                String pname = cursor.getString(1);
+                String type = cursor.getString(2);
+                String ring =cursor.getString(3);
+                int vol = cursor.getInt(4);
+                send = id +","+pname+","+type+","+ring+","+vol;
+
+            }
+
+
+        } catch (Exception e) {
+            Log.i("AllData", "getAllData: " + e.toString());
+            Toast.makeText(context, "getAllData: " + e.toString(), Toast.LENGTH_LONG).show();
+        }
+
+        return send;
+    }
+
 
 
     public int getProfilesCount() {
@@ -128,36 +163,4 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
         }
         return toSend;
     }
-
-
-    public String getRowData( String[] profile_name) {
-        String send = null;
-        SQLiteDatabase db = getReadableDatabase();
-        String[] columns = {UID, PROFILENAME, TYPE, RINGTONE,VOLUME};
-        try {
-            Cursor cursor = db.query(TABLE_NAME, columns, PROFILENAME+"= ? ", profile_name, null,null,null);
-            int size = cursor.getCount();
-            StringBuffer buffer = new StringBuffer();
-
-            while (cursor.moveToNext()) {
-
-                int id = cursor.getInt(0);
-                String pname = cursor.getString(1);
-                String type = cursor.getString(2);
-                String ring =cursor.getString(3);
-                int vol = cursor.getInt(4);
-                send = id +","+pname+","+type+","+ring+","+vol;
-
-            }
-
-
-        } catch (Exception e) {
-            Log.i("AllData", "getAllData: " + e.toString());
-            Toast.makeText(context, "getAllData: " + e.toString(), Toast.LENGTH_LONG).show();
-        }
-
-        return send;
-    }
-
-
 }

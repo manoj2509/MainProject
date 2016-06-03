@@ -23,6 +23,7 @@ public class EventFragment extends Fragment {
 
     public Bundle b;
     List<EventData> data = new ArrayList<>();
+    List<String> profile = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private EventRecyclerViewAdapter mRecyclerviewAdapterEvent;
 
@@ -31,6 +32,7 @@ public class EventFragment extends Fragment {
 
         b = getArguments();
         data = b.getParcelableArrayList("EventData");
+        profile = b.getStringArrayList("profiles");
         super.onCreate(savedInstanceState);
 
     }
