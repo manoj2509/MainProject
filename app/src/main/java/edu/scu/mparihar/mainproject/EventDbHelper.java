@@ -79,7 +79,7 @@ public class EventDbHelper extends SQLiteOpenHelper{
         try {
             Cursor cursor = db.query(TABLE_NAME, columns, NAME+" = ? ", profile_name, null,null,null);
             int size = cursor.getCount();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
 
             while (cursor.moveToNext()) {
 
@@ -90,13 +90,13 @@ public class EventDbHelper extends SQLiteOpenHelper{
                 send = id +","+pname+","+type+","+ring;
 
             }
-
+            cursor.close();
 
         } catch (Exception e) {
             Log.i("AllData", "getAllData: " + e.toString());
             Toast.makeText(context, "getAllData: " + e.toString(), Toast.LENGTH_LONG).show();
         }
-
+        db.close();
         return send;
     }
 
@@ -114,11 +114,11 @@ public class EventDbHelper extends SQLiteOpenHelper{
         contentValues.put(REPEAT_FLAG, flag);
 
         long id = db.insert(TABLE_NAME, null, contentValues);
-        if(id == -1) {
-
+        if(id != -1) {
+            return id;
         }
 
-        return id;
+        return -1;
     }
 
     public List<EventData> getAllData() {
@@ -147,18 +147,29 @@ public class EventDbHelper extends SQLiteOpenHelper{
                     eventData1.setRepeatArray(cursor.getString(8));
                     toSend.add(eventData1);
                 } while (cursor.moveToNext());
-
-                db.close();
-                return toSend;
+                cursor.close();
             }
         } catch (Exception e) {
             Log.v("In All Data: ", e.toString());
         }
+        db.close();
         return toSend;
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+
+    public void deletePastData() {
+        List<EventData> allData;
+        allData = getAllData();
+        SQLiteDatabase db = getWritableDatabase();
+        for (int i = 0; i < allData.size(); i++) {
+            if (allData.get(i).getBeaconId().matches("-1") && allData.get(i).getRepeatFlag() == 0) {
+                // TODO logic to remove past data automatically.
+            }
+        }
 
     }
 }

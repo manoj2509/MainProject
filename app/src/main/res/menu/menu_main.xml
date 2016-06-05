@@ -7,4 +7,9 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/uninstall"
+        android:orderInCategory="101"
+        android:title="@string/uninstall"
+        app:showAsAction="never" />
 </menu>

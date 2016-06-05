@@ -50,13 +50,27 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         try {
             db.execSQL(CREATE_TABLE);
-            String uid = "Silent";
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(PROFILENAME, "Silent");
+            contentValues.put(TYPE, "Silent");
+            contentValues.put(RINGTONE, "");
+            contentValues.put(VOLUME, 0);
+            long id1 = db.insert(TABLE_NAME, null, contentValues);
+
+            contentValues = new ContentValues();
+            contentValues.put(PROFILENAME, "Vibrate");
+            contentValues.put(TYPE, "Vibrate Mode");
+            contentValues.put(RINGTONE, "");
+            contentValues.put(VOLUME, 0);
+            long id2 = db.insert(TABLE_NAME, null, contentValues);
+//            String uid = "Silent";
 //            String sql1 = "insert into " +TABLE_NAME+ " (" +PROFILENAME+ ", " +TYPE+ ") values(" +uid+  "," +uid+ ")";
 //            db.execSQL(sql1);
 
 //            insertData("Silent", "Silent", "", 0);
 //            insertData("Vibrate", "Vibrate Mode", "", 0);
-           // Toast.makeText(context, "Database successfully created", Toast.LENGTH_LONG).show();
+//            Toast.makeText(context, "Database successfully created", Toast.LENGTH_LONG).show();
+            Log.v("Creating Database", "Success!");
         } catch (android.database.SQLException e) {
             Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
         }
@@ -73,19 +87,22 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
         try {
             Cursor cursor = db.query(TABLE_NAME, columns, PROFILENAME+"= ? ", profile_name, null,null,null);
             int size = cursor.getCount();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
 
-            while (cursor.moveToNext()) {
+            if (cursor.moveToFirst()) {
+                do {
 
-                int id = cursor.getInt(0);
-                String pname = cursor.getString(1);
-                String type = cursor.getString(2);
-                String ring =cursor.getString(3);
-                int vol = cursor.getInt(4);
-                send = id +","+pname+","+type+","+ring+","+vol;
+                    int id = cursor.getInt(0);
+                    String pname = cursor.getString(1);
+                    String type = cursor.getString(2);
+                    String ring = cursor.getString(3);
+                    int vol = cursor.getInt(4);
+                    send = id + "," + pname + "," + type + "," + ring + "," + vol;
 
+                } while (cursor.moveToNext());
+                cursor.close();
+                db.close();
             }
-
 
         } catch (Exception e) {
             Log.i("AllData", "getAllData: " + e.toString());
@@ -124,11 +141,12 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
         contentValues.put(RINGTONE, ringtone);
         contentValues.put(VOLUME, volume);
         long id = db.insert(TABLE_NAME, null, contentValues);
-        if(id == -1) {
-
+        if(id != -1) {
+            return id;
+        } else {
+            return -1;
         }
 
-        return id;
     }
 
 

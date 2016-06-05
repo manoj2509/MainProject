@@ -117,7 +117,7 @@ public class AddEvent extends AppCompatActivity {
         beacons.add("Beacon ID1");
         beacons.add("Beacon ID2");
         beacons.add("Beacon ID3");
-        ArrayAdapter<String> beaconAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, beacons);
+        ArrayAdapter<String> beaconAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, beacons);
         beacon_spinner.setAdapter(beaconAdapter);
         beacon_spinner.setSelection(0);
         beacon_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -288,11 +288,11 @@ public class AddEvent extends AppCompatActivity {
                         eventObject.setRepeatArray("");                                             // 8
                     } else {
                         eventObject.setBeaconId("-1");                                              // 5
-                        if (eventObject.getStartTime() == "") {
+                        if (eventObject.getStartTime().equals("")) {
                             fromTime.setError("Choose start time!");
                             flag = 1;
                         }
-                        if (eventObject.getEndTime() == "") {
+                        if (eventObject.getEndTime().equals("")) {
                             toTime.setError("Choose End time!");
                             flag = 2;
                         }
@@ -316,7 +316,7 @@ public class AddEvent extends AppCompatActivity {
                             temp = toggleButtonSun.isChecked() ? 1 : 0;
                             stringBuilder.append(Integer.toString(temp));
                             eventObject.setRepeatArray(stringBuilder.toString());                   // 8
-                            if (eventObject.getRepeatArray() == "0000000") {
+                            if (eventObject.getRepeatArray().equals("0000000")) {
                                 flag = 3;
                                 fromTime.setError("Select some days below!");
                             }
@@ -349,9 +349,8 @@ public class AddEvent extends AppCompatActivity {
 
     // Update date on edit Text.
     private void updateDateText(Calendar datePicker) {
-        String dateFormat = "MM/dd/yy";
+        String dateFormat = "yy/MM/dd";
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
-
         editDate.setText(sdf.format(datePicker.getTime()));
     }
 }

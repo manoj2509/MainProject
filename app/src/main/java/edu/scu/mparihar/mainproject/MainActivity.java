@@ -2,6 +2,7 @@ package edu.scu.mparihar.mainproject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
@@ -29,6 +30,8 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements Serializable {
 
+    int ADD_EVENT_INTENT = 1;
+    int ADD_PROFILE_INTENT = 2;
     EventData ed;
     ProfileData newData;
     Context context;
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         profileDbHelper = new ProfileDbHelper(context);
 
         // Extract from database.
+        eventDbHelper.deletePastData();
         AllData = eventDbHelper.getAllData();
 //        Log.v("Getting all data: ", AllData.get(0).getName());
 //        Log.v("Getting all data: ", AllData.get(1).getName());
@@ -84,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                     ProfileNames.add(AllProfiles.get(i).getName());
                 }
                 intent.putStringArrayListExtra("profiles", (ArrayList<String>) ProfileNames);
-                startActivityForResult(intent, 1);
+                startActivityForResult(intent, ADD_EVENT_INTENT);
             }
         });
 
@@ -94,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(MainActivity.this,AddProfile.class);
-                    startActivityForResult(intent,2);
+                    startActivityForResult(intent, ADD_PROFILE_INTENT);
                 }
             });
         }
@@ -194,10 +198,10 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         long difference;
         try {
-            if (requestCode == 1) {
+            if (requestCode == ADD_EVENT_INTENT) {
                 if (resultCode == RESULT_OK) {
                     // get object, put to database, notify data-set changed
-                    ed = (EventData) data.getParcelableExtra("Object");
+                    ed = data.getParcelableExtra("Object");
 //                    ed = (EventData) data.getSerializableExtra("Object");
 
                     long r= eventDbHelper.insertData(ed.getName(), ed.getProfile(), ed.getBeaconId(), ed.getStartTime(), ed.getEndTime(), ed.getDate(), ed.getRepeatArray(), ed.getRepeatFlag());
@@ -280,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                 Toast.makeText(this, "There was an error setting the event. Try again.", Toast.LENGTH_LONG).show();
             }
 
-            if (requestCode == 2) {
+            if (requestCode == ADD_PROFILE_INTENT) {
                 if (resultCode == RESULT_OK) {
                     // get object, put to database, notify data set changed.
                     newData = data.getParcelableExtra("Profile");
@@ -295,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
 
                 }
                 if (resultCode == RESULT_CANCELED) {
-
+                    Toast.makeText(this, "Error encountered", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -329,6 +333,9 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         if (id == R.id.action_settings) {
             return true;
         }
+        if (id == R.id.uninstall) {
+            uninstallApp();
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -339,9 +346,11 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         String[] units = time.split(":"); //will break the string up into an array
         int hours = Integer.parseInt(units[0]); //first element
         int minutes = Integer.parseInt(units[1]); //second element
-        int duration = 60 * 60 * hours + minutes * 60; //add up our values
-        return duration;
+        return 60 * 60 * hours + minutes * 60;
     }
 
+    public void uninstallApp() {
+        startActivity(new Intent(Intent.ACTION_DELETE).setData(Uri.parse("package:edu.scu.mparihar.mainproject")));
+    }
 
 }
