@@ -1,8 +1,13 @@
 package edu.scu.mparihar.mainproject;
 
+import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +24,8 @@ import android.app.AlarmManager;
 import java.io.Serializable;
 import android.app.PendingIntent;
 
+import org.altbeacon.beacon.BeaconManager;
+
 import java.util.ArrayList;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,6 +37,8 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements Serializable {
 
+    protected static final String TAG = "MainActivity";
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     int ADD_EVENT_INTENT = 1;
     int ADD_PROFILE_INTENT = 2;
     EventData ed;
@@ -38,13 +47,14 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     Intent intentAlarm,intentAlarm1;
     AlarmManager alarmManager,alarmManager1;
     PendingIntent pendingIntent,pendingIntent1;
-    List<EventData> AllData;
+    static List<EventData> AllData;
     List<ProfileData> AllProfiles;
     List<String> ProfileNames;
     private TabLayout tabLayout;
     SimpleDateFormat formatter = new SimpleDateFormat("mm/dd/yy");
     EventDbHelper eventDbHelper;
     ProfileDbHelper profileDbHelper;
+
 
     private ViewPager viewPager;
     private int[] tabIcons = {
@@ -60,15 +70,40 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         context = this;
-
+        verifyBluetooth();
         AllData = new ArrayList<>();
         AllProfiles = new ArrayList<>();
         ProfileNames = new ArrayList<>();
         eventDbHelper =  new EventDbHelper(context);
         profileDbHelper = new ProfileDbHelper(context);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Android M Permission check
+            if (this.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("This app needs location access");
+                builder.setMessage("Please grant location access so this app can detect beacons in the background.");
+                builder.setPositiveButton(android.R.string.ok, null);
+                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                    @TargetApi(23)
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                                PERMISSION_REQUEST_COARSE_LOCATION);
+                    }
+
+                });
+                builder.show();
+            }
+        }
+        // Delete past events.
+        try {
+            eventDbHelper.deletePastData();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         // Extract from database.
-        eventDbHelper.deletePastData();
         AllData = eventDbHelper.getAllData();
 //        Log.v("Getting all data: ", AllData.get(0).getName());
 //        Log.v("Getting all data: ", AllData.get(1).getName());
@@ -119,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
             public void onTabReselected(TabLayout.Tab tab) {
 
             }
+
         };
 
 
@@ -194,6 +230,32 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_COARSE_LOCATION: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "coarse location permission granted");
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Functionality limited");
+                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                        }
+
+                    });
+                    builder.show();
+                }
+            }
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         long difference;
@@ -244,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                     //Toast.makeText(this, "Success" + time, Toast.LENGTH_LONG).show();
 
                     //new intent
-
+                    // Setting the end time
                     String[] stop = ed.getEndTime().split(":"); //will break the string up into an array
                     hours = Integer.parseInt(stop[0]); //first element
                     minutes = Integer.parseInt(stop[1]); //second element
@@ -272,16 +334,11 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                     //set the alarm for particular time
                     alarmManager1.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent1);
                     //Toast.makeText(this, "Success" + time, Toast.LENGTH_LONG).show();
-
-
-
-
+                }
+                if (resultCode == RESULT_CANCELED) {
+                    Toast.makeText(this, "There was an error setting the event. Try again.", Toast.LENGTH_LONG).show();
                 }
 
-
-            }
-            if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "There was an error setting the event. Try again.", Toast.LENGTH_LONG).show();
             }
 
             if (requestCode == ADD_PROFILE_INTENT) {
@@ -315,6 +372,56 @@ public class MainActivity extends AppCompatActivity implements Serializable {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((BeaconApplication) this.getApplicationContext()).setMainActivity(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ((BeaconApplication) this.getApplicationContext()).setMainActivity(null);
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private void verifyBluetooth() {
+
+        try {
+            if (!BeaconManager.getInstanceForApplication(this).checkAvailability()) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Bluetooth not enabled");
+                builder.setMessage("Please enable bluetooth in settings and restart this application.");
+                builder.setPositiveButton(android.R.string.ok, null);
+                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        finish();
+                        System.exit(0);
+                    }
+                });
+                builder.show();
+            }
+        }
+        catch (RuntimeException e) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Bluetooth LE not available");
+            builder.setMessage("Sorry, this device does not support Bluetooth LE.");
+            builder.setPositiveButton(android.R.string.ok, null);
+            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    finish();
+                    System.exit(0);
+                }
+
+            });
+            builder.show();
+
+        }
+
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -352,5 +459,17 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     public void uninstallApp() {
         startActivity(new Intent(Intent.ACTION_DELETE).setData(Uri.parse("package:edu.scu.mparihar.mainproject")));
     }
+
+
+
+//    public void logToDisplay(final String line) {
+//        runOnUiThread(new Runnable() {
+//            public void run() {
+//                EditText editText = (EditText)MainActivity.this
+//                        .findViewById(R.id.monitoringText);
+//                editText.append(line+"\n");
+//            }
+//        });
+//    }
 
 }

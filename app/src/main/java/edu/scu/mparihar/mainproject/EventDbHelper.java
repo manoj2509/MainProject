@@ -8,13 +8,17 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created by Mj on 24-May-16.
  */
-public class EventDbHelper extends SQLiteOpenHelper{
+public class EventDbHelper extends SQLiteOpenHelper {
 
     protected Context context;
     protected static final String DATABASE_NAME = "SmartNotifier.db";
@@ -31,25 +35,22 @@ public class EventDbHelper extends SQLiteOpenHelper{
     protected static final String REPEAT = "repeatArray";
     protected static final String REPEAT_FLAG = "repeatFlag";
 
-    private static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " ("+
-            UID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+    private static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
+            UID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             NAME + " TEXT, " +
-            PROFILE + " TEXT, " +   BEACONID + " TEXT, "+
-            START + " TEXT, "+
-            END + " TEXT, "+
-            CDATE + " TEXT, "+
+            PROFILE + " TEXT, " + BEACONID + " TEXT, " +
+            START + " TEXT, " +
+            END + " TEXT, " +
+            CDATE + " TEXT, " +
             REPEAT + " TEXT, "
             + REPEAT_FLAG + " INTEGER )";
 
-    protected static final String DROP_TABLE ="DROP TABLE IF EXISTS " +TABLE_NAME;
-
-
-
+    protected static final String DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
 
     public EventDbHelper(Context context) {
-        super(context,DATABASE_NAME, null, DATABASE_VERSION);
-        this.context=context;
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -72,12 +73,12 @@ public class EventDbHelper extends SQLiteOpenHelper{
     }
 
 
-    public String getRowData( String[] profile_name) {
-        String send = null;
+    public String getRowData(String[] profile_name) {
+        String send = "";
         SQLiteDatabase db = getReadableDatabase();
         String[] columns = {UID, NAME, PROFILE, BEACONID};
         try {
-            Cursor cursor = db.query(TABLE_NAME, columns, NAME+" = ? ", profile_name, null,null,null);
+            Cursor cursor = db.query(TABLE_NAME, columns, NAME + " = ? ", profile_name, null, null, null);
             int size = cursor.getCount();
             StringBuilder buffer = new StringBuilder();
 
@@ -86,8 +87,8 @@ public class EventDbHelper extends SQLiteOpenHelper{
                 int id = cursor.getInt(0);
                 String pname = cursor.getString(1);
                 String type = cursor.getString(2);
-                String ring =cursor.getString(3);
-                send = id +","+pname+","+type+","+ring;
+                String ring = cursor.getString(3);
+                send = id + "," + pname + "," + type + "," + ring;
 
             }
             cursor.close();
@@ -101,7 +102,7 @@ public class EventDbHelper extends SQLiteOpenHelper{
     }
 
 
-    public long insertData(String name,String profile,String beaconId,String startTime, String endTime, String cdate, String repeatArray, int flag) {
+    public long insertData(String name, String profile, String beaconId, String startTime, String endTime, String cdate, String repeatArray, int flag) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(NAME, name);
@@ -114,7 +115,7 @@ public class EventDbHelper extends SQLiteOpenHelper{
         contentValues.put(REPEAT_FLAG, flag);
 
         long id = db.insert(TABLE_NAME, null, contentValues);
-        if(id != -1) {
+        if (id != -1) {
             return id;
         }
 
@@ -125,7 +126,7 @@ public class EventDbHelper extends SQLiteOpenHelper{
         EventData eventData1;
         List<EventData> toSend = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
-        String[] columns = {EventDbHelper.UID, EventDbHelper.NAME,EventDbHelper.PROFILE ,
+        String[] columns = {EventDbHelper.UID, EventDbHelper.NAME, EventDbHelper.PROFILE,
                 EventDbHelper.BEACONID, EventDbHelper.REPEAT_FLAG, EventDbHelper.CDATE,
                 EventDbHelper.START, EventDbHelper.END, EventDbHelper.REPEAT};
         try {
@@ -161,15 +162,68 @@ public class EventDbHelper extends SQLiteOpenHelper{
 
     }
 
-    public void deletePastData() {
+    public void deletePastData() throws ParseException {
         List<EventData> allData;
         allData = getAllData();
+        SimpleDateFormat curFormatter = new SimpleDateFormat("yyyy/MM/dd");
+        Calendar c = Calendar.getInstance();
+        String curDateString = curFormatter.format(c.getTime());
+        Date endDate;
+        Date curDate = curFormatter.parse(curDateString);
+//        String curDate = curFormatter.format(c.getTime());
         SQLiteDatabase db = getWritableDatabase();
         for (int i = 0; i < allData.size(); i++) {
             if (allData.get(i).getBeaconId().matches("-1") && allData.get(i).getRepeatFlag() == 0) {
                 // TODO logic to remove past data automatically.
+                endDate = curFormatter.parse(allData.get(i).getDate());
+                if (endDate.before(curDate)) {
+                    deleteData(allData.get(i).getId());
+                }
             }
         }
 
+    }
+
+    public List<String> getAllBeaconIds() {
+        String string1;
+        List<String> toSend = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        String[] columns = {EventDbHelper.BEACONID};
+        try {
+            Cursor cursor = db.query(EventDbHelper.TABLE_NAME, columns, null, null, null, null, null);
+            if (cursor.moveToFirst()) {
+                do {
+                    // get the data into array, or class variable
+                    string1 = cursor.getString(0);
+                    toSend.add(string1);
+                } while (cursor.moveToNext());
+                cursor.close();
+            }
+        } catch (Exception e) {
+            Log.v("In All Data: ", e.toString());
+        }
+        db.close();
+        return toSend;
+    }
+
+    public String getProfileNameforBeaconId(String beaconId) {
+        String send = "";
+        SQLiteDatabase db = getReadableDatabase();
+//        String[] columns = {PROFILE};
+        try {
+            Cursor cursor = db.rawQuery("SELECT " + PROFILE + " FROM " + TABLE_NAME + " WHERE " +
+                    BEACONID + " = ?", new String[]{beaconId});
+//            Cursor cursor = db.query(TABLE_NAME, columns, BEACONID + " = " + beaconId, null, null, null, null);
+            int size = cursor.getCount();
+            StringBuilder buffer = new StringBuilder();
+            if (cursor.moveToFirst()) {
+                send = cursor.getString(0);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            Log.v("In All Data: ", e.toString());
+        }
+        db.close();
+        return send;
     }
 }

@@ -2,7 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="85dp"
     android:orientation="vertical"
     android:gravity="center">
 
@@ -15,7 +15,8 @@
         android:paddingTop="5dp"
         android:textSize="24sp"
         android:ellipsize="marquee"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:textStyle="bold" />
 
     <TextView
         android:layout_width="match_parent"
@@ -26,6 +27,17 @@
         android:textSize="14sp"
         android:paddingBottom="5dp"
         android:ellipsize="marquee"
-        android:singleLine="true"/>
+        android:singleLine="true" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/date_sample"
+        android:paddingLeft="20dp"
+        android:id="@+id/event_list_date"
+        android:textSize="14sp"
+        android:paddingBottom="5dp"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:textStyle="bold" />
 
 </LinearLayout>

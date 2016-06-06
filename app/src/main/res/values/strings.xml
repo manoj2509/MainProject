@@ -22,6 +22,7 @@
     <string name="select_a_rongtone">Select a Rongtone!</string>
     <string name="select_volume">Select Volume:</string>
     <string name="uninstall">Uninstall the app</string>
+    <string name="date_sample">09/25/2016</string>
     <string-array name="profile_name">
         <item>Silent</item>
         <item>Vibrate Mode</item>

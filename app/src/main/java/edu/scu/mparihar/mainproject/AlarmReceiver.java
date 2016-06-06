@@ -14,6 +14,9 @@ import java.util.List;
 
 import android.app.NotificationManager;
 
+import static android.content.Context.*;
+import static android.content.Context.AUDIO_SERVICE;
+
 /**
  * Created by mahendramhatre on 5/25/16.
  */
@@ -32,7 +35,7 @@ public class AlarmReceiver extends BroadcastReceiver {
          String g = eventDbHelper.getAllData(s);
          eventData ed = (eventData) intent.getSerializableExtra("v");
          String []split = g.split(",");*/
-        audioManager = (AudioManager) context.getSystemService(context.AUDIO_SERVICE);
+        audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
 
         String start = intent.getStringExtra("x");
         profileNames = intent.getStringArrayListExtra("profiles");
@@ -40,7 +43,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 
             profileDbHelper = new ProfileDbHelper(context);
-            EventData ed = (EventData) intent.getParcelableExtra("v");
+            EventData ed = intent.getParcelableExtra("v");
             String s[] = {ed.getProfile()};
 
             String prof_info = profileDbHelper.getRowData(s);
@@ -69,7 +72,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                     .setAutoCancel(true); // clear notification after click
 
             mNotificationManager =
-                    (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                    (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
             mNotificationManager.notify(0, mBuilder.build());
 
 
@@ -79,12 +82,12 @@ public class AlarmReceiver extends BroadcastReceiver {
             audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
             Toast.makeText(context, "Alarm Triggered ", Toast.LENGTH_LONG).show();
             mBuilder =  new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.ic_add_alert_50dp) // notification icon
+                    .setSmallIcon(R.drawable.icon_outline) // notification icon
                     .setContentTitle("Smart Notifier!") // title for notification
                     .setContentText("Your phone setting has been changed to Ringer") // message for notification
                     .setAutoCancel(true); // clear notification after click
 
-           mNotificationManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+           mNotificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
             mNotificationManager.notify(0, mBuilder.build());
 
 

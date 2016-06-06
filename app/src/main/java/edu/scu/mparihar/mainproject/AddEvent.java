@@ -114,7 +114,7 @@ public class AddEvent extends AppCompatActivity {
             }
         });
         // Getting spinner elements for Beacon.
-        beacons.add("Beacon ID1");
+        beacons.add("c22d3f7f-22f8-49ef-a72e-7d6f0b6b990a");
         beacons.add("Beacon ID2");
         beacons.add("Beacon ID3");
         ArrayAdapter<String> beaconAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, beacons);
@@ -283,7 +283,7 @@ public class AddEvent extends AppCompatActivity {
                     eventObject.setProfile(profile_spinner.getSelectedItem().toString());           // 4
                     if (beacon_toggle.isChecked()) {
                         eventObject.setBeaconId(beacon_spinner.getSelectedItem().toString());       // 5
-                        eventObject.setRepeatFlag(0);                                           // 6
+                        eventObject.setRepeatFlag(0);                                               // 6
                         eventObject.setDate("0");                                                   // 7
                         eventObject.setRepeatArray("");                                             // 8
                     } else {

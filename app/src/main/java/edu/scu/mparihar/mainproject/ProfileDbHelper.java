@@ -181,4 +181,33 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
         }
         return toSend;
     }
+
+    public ProfileData getProfilebyProfileName(String profileName) {
+        ProfileData profileData1;
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {ProfileDbHelper.UID, ProfileDbHelper.PROFILENAME, ProfileDbHelper.TYPE,
+                ProfileDbHelper.RINGTONE, ProfileDbHelper.VOLUME};
+        try {
+            Cursor cursor = db.query(ProfileDbHelper.TABLE_NAME, columns, PROFILENAME + "=?", new String[]{profileName}, null, null, null);
+            if (cursor.moveToFirst()) {
+                do {
+                    // get the data into array, or class variable
+                    profileData1 = new ProfileData();
+
+                    profileData1.setId(cursor.getInt(0));
+                    profileData1.setName(cursor.getString(1));
+                    profileData1.setType(cursor.getString(2));
+                    profileData1.setRingtone(cursor.getString(3));
+                    profileData1.setVolume(cursor.getInt(4));
+                } while (cursor.moveToNext());
+
+                db.close();
+                cursor.close();
+                return profileData1;
+            }
+        } catch (Exception e) {
+            Log.v("In Profile Data by Name", e.toString());
+        }
+        return null;
+    }
 }
