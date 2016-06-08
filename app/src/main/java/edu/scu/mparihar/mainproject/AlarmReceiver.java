@@ -1,14 +1,19 @@
 package edu.scu.mparihar.mainproject;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Toast;
 import android.app.PendingIntent;
 import android.support.v4.app.NotificationCompat;
+
+import java.io.File;
 import java.net.URI;
 import java.util.List;
 
@@ -47,6 +52,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             String s[] = {ed.getProfile()};
 
             String prof_info = profileDbHelper.getRowData(s);
+            Log.v("In Alarm Receiver", prof_info);
             String[] split = prof_info.split(",");
 
             if (split[2].equalsIgnoreCase("Silent")) {
@@ -59,6 +65,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
                 audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
                 audioManager.setStreamVolume(AudioManager.STREAM_ALARM, Integer.parseInt(split[4]), 0);
+                Uri uri = Uri.parse("content://media" +split[3]);
+                RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, uri);
+
+
             }
 
             //  ringtoneManager.getRingtone(context,Uri.parse(split[3]));
@@ -66,7 +76,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             Toast.makeText(context, "Alarm Triggered " + split[2] + split[4], Toast.LENGTH_LONG).show();
 
             mBuilder =   new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.ic_add_alert_50dp) // notification icon
+                    .setSmallIcon(R.drawable.icon_outline) // notification icon
                     .setContentTitle("Smart Notifier!") // title for notification
                     .setContentText("Your phone setting has been changed to "+split[2]) // message for notification
                     .setAutoCancel(true); // clear notification after click

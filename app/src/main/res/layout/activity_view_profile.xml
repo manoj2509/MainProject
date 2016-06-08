@@ -23,8 +23,6 @@
             android:textSize="18sp"
             android:layout_marginTop="40dp"/>
 
-        <View style="@style/Divider"/>
-
         <Spinner
             android:layout_width="300dp"
             android:layout_height="wrap_content"
@@ -32,8 +30,6 @@
             android:entries="@array/profile_name"
             android:layout_marginTop="36dp"
             android:paddingBottom="20dp"/>
-
-        <View style="@style/Divider"/>
 
         <LinearLayout
             android:layout_width="300dp"
@@ -53,8 +49,6 @@
                 android:id="@+id/volume_seekbar" />
         </LinearLayout>
 
-        <View style="@style/Divider"/>
-
         <TextView
             android:layout_width="300dp"
             android:layout_height="wrap_content"
@@ -68,8 +62,6 @@
             android:text="@string/tap_to_select_ringtone"
             android:id="@+id/ringtone_button"
             android:background="@color/transparent_color" />
-
-        <View style="@style/Divider"/>
 
         <TextView
             android:layout_width="wrap_content"

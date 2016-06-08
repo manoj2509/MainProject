@@ -25,7 +25,7 @@ public class EventFragment extends Fragment {
     List<EventData> data = new ArrayList<>();
     List<String> profile = new ArrayList<>();
     private RecyclerView mRecyclerView;
-    private EventRecyclerViewAdapter mRecyclerviewAdapterEvent;
+    public static EventRecyclerViewAdapter mRecyclerviewAdapterEvent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

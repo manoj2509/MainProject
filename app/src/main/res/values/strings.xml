@@ -23,6 +23,9 @@
     <string name="select_volume">Select Volume:</string>
     <string name="uninstall">Uninstall the app</string>
     <string name="date_sample">09/25/2016</string>
+    <string name="save_again">Save Again</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
     <string-array name="profile_name">
         <item>Silent</item>
         <item>Vibrate Mode</item>

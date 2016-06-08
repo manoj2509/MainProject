@@ -226,4 +226,19 @@ public class EventDbHelper extends SQLiteOpenHelper {
         db.close();
         return send;
     }
+
+    public void updateData(int id, EventData eventObject) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(NAME, eventObject.getName());
+        contentValues.put(PROFILE, eventObject.getProfile());
+        contentValues.put(BEACONID, eventObject.getBeaconId());
+        contentValues.put(START, eventObject.getStartTime());
+        contentValues.put(END, eventObject.getEndTime());
+        contentValues.put(CDATE, eventObject.getDate());
+        contentValues.put(REPEAT, eventObject.getRepeatArray());
+        contentValues.put(REPEAT_FLAG, eventObject.getRepeatFlag());
+
+        db.update(TABLE_NAME, contentValues, UID + "=" + id, null);
+    }
 }

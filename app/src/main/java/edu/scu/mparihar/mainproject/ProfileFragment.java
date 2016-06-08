@@ -24,7 +24,7 @@ public class ProfileFragment extends Fragment {
     public Bundle b;
     List<ProfileData> data = new ArrayList<>();
     private RecyclerView mRecyclerView;
-    private ProfileRecyclerViewAdapter mRecyclerviewAdapterProfile;
+    public static ProfileRecyclerViewAdapter mRecyclerviewAdapterProfile;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // TODO add data also.

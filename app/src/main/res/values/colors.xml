@@ -7,4 +7,5 @@
     <color name="navigationBarColor">#E64A19</color>
     <color name="colorAccent">#FFC107</color>
     <color name="transparent_color">#00000000</color>
+    <color name="colorDisabledButton">#E6A08A</color>
 </resources>

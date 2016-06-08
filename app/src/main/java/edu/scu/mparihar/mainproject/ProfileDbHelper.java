@@ -83,7 +83,7 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
     public String getRowData( String[] profile_name) {
         String send = null;
         SQLiteDatabase db = getReadableDatabase();
-        String[] columns = {UID, PROFILENAME, TYPE, RINGTONE,VOLUME};
+        String[] columns = {UID, PROFILENAME, TYPE, RINGTONE, VOLUME};
         try {
             Cursor cursor = db.query(TABLE_NAME, columns, PROFILENAME+"= ? ", profile_name, null,null,null);
             int size = cursor.getCount();
@@ -209,5 +209,16 @@ public class ProfileDbHelper extends SQLiteOpenHelper {
             Log.v("In Profile Data by Name", e.toString());
         }
         return null;
+    }
+
+    public void updateData(int id, ProfileData profileObject) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(PROFILENAME, profileObject.getName());
+        contentValues.put(TYPE, profileObject.getType());
+        contentValues.put(RINGTONE, profileObject.getRingtone());
+        contentValues.put(VOLUME, profileObject.getVolume());
+
+        db.update(TABLE_NAME, contentValues, UID + "=" + id, null);
     }
 }

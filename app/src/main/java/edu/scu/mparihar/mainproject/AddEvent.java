@@ -115,7 +115,7 @@ public class AddEvent extends AppCompatActivity {
         });
         // Getting spinner elements for Beacon.
         beacons.add("c22d3f7f-22f8-49ef-a72e-7d6f0b6b990a");
-        beacons.add("Beacon ID2");
+        beacons.add("b9407f30-f5f8-466e-aff9-25556b57fe6d");
         beacons.add("Beacon ID3");
         ArrayAdapter<String> beaconAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, beacons);
         beacon_spinner.setAdapter(beaconAdapter);

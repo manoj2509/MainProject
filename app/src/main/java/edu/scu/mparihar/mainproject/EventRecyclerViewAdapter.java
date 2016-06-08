@@ -1,5 +1,6 @@
 package edu.scu.mparihar.mainproject;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,14 +47,22 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
                 String FlagToDays = "";
                 String flagArray = eventData1.getRepeatArray();
                 int flag;
-                for (int i = 0; i < len; i++) {
-                    flag = 0;
-                    if (flagArray.substring(i, i + 1).equals("1")) {
-                        FlagToDays += Day.get(i);
-                        flag = 1;
-                    }
-                    if (i != len - 1 && flag == 1) {
-                        FlagToDays += ", ";
+                if (flagArray.matches("1111111")) {
+                    FlagToDays = "Everyday";
+                } else if (flagArray.matches("1111100")) {
+                    FlagToDays = "Weekdays";
+                } else if (flagArray.matches("0000011")) {
+                    FlagToDays = "Weekends";
+                } else {
+                    for (int i = 0; i < len; i++) {
+                        flag = 0;
+                        if (flagArray.substring(i, i + 1).equals("1")) {
+                            FlagToDays += Day.get(i);
+                            flag = 1;
+                        }
+                        if (i != len - 1 && flag == 1) {
+                            FlagToDays += ", ";
+                        }
                     }
                 }
                 tempDate = FlagToDays;
@@ -72,22 +81,24 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
     public final static class MyViewHolder extends RecyclerView.ViewHolder{
 
         public TextView entryName, entryTime, entryExtra;
-        public MyViewHolder(View itemView) {
+        public MyViewHolder(final View itemView) {
             super(itemView);
             entryName = (TextView) itemView.findViewById(R.id.event_list_name);
             entryTime = (TextView) itemView.findViewById(R.id.event_list_time);
             entryExtra = (TextView) itemView.findViewById(R.id.event_list_date);
-//            itemView.setOnClickListener(new View.OnClickListener() {
-//
-////                @Override
-////                public void onClick(View v) {
-////                    int pos = getAdapterPosition();
-////
-////                    Intent intent = new Intent(itemView.getContext(), ViewActivity.class).putExtra("Position", Integer.toString(pos));
-////                    itemView.getContext().startActivity(intent);
-////
-////                }
-//            });
+            itemView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+
+                    Intent intent = new Intent(itemView.getContext(), ViewEventActivity.class).
+                            putExtra("Position", pos);
+                    itemView.getContext().startActivity(intent);
+
+
+                }
+            });
         }
     }
 }

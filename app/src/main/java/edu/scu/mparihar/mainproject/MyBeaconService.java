@@ -2,11 +2,20 @@ package edu.scu.mparihar.mainproject;
 
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
+import android.preference.RingtonePreference;
+import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,6 +29,7 @@ import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
@@ -114,8 +124,10 @@ public class MyBeaconService extends Service implements BeaconConsumer {
             public void didExitRegion(Region region) {
                 try {
                     Log.e(TAG, "didExitRegion");
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                    notifyUser("Normal Ringer Mode");
+                    if (audioManager.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {
+                        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                        notifyUser("Normal Ringer Mode");
+                    }
                     beaconManager.stopRangingBeaconsInRegion(region);
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -133,43 +145,58 @@ public class MyBeaconService extends Service implements BeaconConsumer {
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 if (beacons.size() > 0) {
                     //EditText editText = (EditText)RangingActivity.this.findViewById(R.id.rangingText);
-                    Beacon firstBeacon = beacons.iterator().next();
-                    Log.v("Beacon ID Service ", "" + firstBeacon.getId1());
-                    getAllEventBeacons();
-                    int pos = checkForBeacon(firstBeacon.getId1(), firstBeacon.getId2(), firstBeacon.getId3());
-                    if (pos > -1) {
-                        // TODO Set profile properties of matching beacon.
+//                    Beacon firstBeacon = beacons.iterator().next();
+                    for (Beacon firstBeacon: beacons) {
+                        Log.v("Beacon ID Service ", "" + firstBeacon.getId1());
+                        getAllEventBeacons();
+                        int pos = checkForBeacon(firstBeacon.getId1(), firstBeacon.getId2(), firstBeacon.getId3());
+                        if (pos > -1) {
+                            // TODO Set profile properties of matching beacon.
 
 //                        Toast.makeText(context, "Beacon Intent detected", Toast.LENGTH_SHORT).show();
 //                        Log.v("Beacon found", "You can do your stuff here.");
-                        getProfileForBeacon(firstBeacon.getId1().toString());
-                        int flag = 0;
-                        if (profileForBeacon.getType().equalsIgnoreCase("Silent")) {
-                            if (audioManager.getRingerMode() != AudioManager.RINGER_MODE_SILENT)
-                            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                            flag = 1;
-                        } else if (profileForBeacon.getType().equalsIgnoreCase("Ringer Mode")) {
-                            if (audioManager.getRingerMode() != AudioManager.RINGER_MODE_NORMAL &&
-                                    audioManager.getStreamVolume(AudioManager.STREAM_RING) !=
-                                            profileForBeacon.getVolume()) {
-                                audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-                                audioManager.setStreamVolume(AudioManager.STREAM_RING,
-                                        profileForBeacon.getVolume(), 0);
-                                flag = 2;
-                            }
-                        } else {
-                            if (audioManager.getRingerMode() != AudioManager.RINGER_MODE_VIBRATE) {
-                                audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-                                flag = 3;
-                            }
-                        }
-                        if (flag != 0) {
-                            notifyUser(profileForBeacon.getName());
-                        }
+                            getProfileForBeacon(firstBeacon.getId1().toString());
+                            int flag = 0;
+                            if (profileForBeacon.getType().equalsIgnoreCase("Silent")) {
+                                if (audioManager.getRingerMode() != AudioManager.RINGER_MODE_SILENT)
+                                    audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                                flag = 1;
+                            } else {
+                                if (profileForBeacon.getType().equalsIgnoreCase("Ringer Mode")) {
+                                    Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
+                                    String strRingtonePreference = defaultRingtoneUri.getPath();
 
-                    } else {
+                                    if (audioManager.getRingerMode() != AudioManager.RINGER_MODE_NORMAL ||
+                                            !strRingtonePreference.equals(profileForBeacon.getRingtone())) {
+                                        Log.i("Get/Set ringtone", "p" + strRingtonePreference + "qAq" + profileForBeacon.getRingtone() + "q");
+                                        Log.i("Get/Set ringtone", String.valueOf(audioManager.getRingerMode()));
+                                        audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                                        audioManager.setStreamVolume(AudioManager.STREAM_RING,
+                                                profileForBeacon.getVolume(), 1);
+//                                        Log.v("Getting Ringtone", "q" + strRingtonePreference + "q\tq" + profileForBeacon.getRingtone() + "q");
+//                                        changeRingtone(profileForBeacon.getRingtone());
+//                                        File k = new File("content://media" + profileForBeacon.getRingtone());
+//                                        Uri uri = MediaStore.Audio.Media.getContentUriForPath(
+//                                                profileForBeacon.getRingtone());
+                                        Uri uri = Uri.parse("content://media" +profileForBeacon.getRingtone());
+                                        RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, uri);
+                                        flag = 2;
+                                    }
+                                } else {
+                                    if (audioManager.getRingerMode() != AudioManager.RINGER_MODE_VIBRATE) {
+                                        audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+                                        flag = 3;
+                                    }
+                                }
+                            }
+                            if (flag != 0) {
+                                notifyUser(profileForBeacon.getName());
+                            }
+
+                        } else {
 //                        Toast.makeText(context, "Beacon Intent detected but no beacon found", Toast.LENGTH_SHORT).show();
-                        Log.v("Beacon not found", "You can do your stuff here.");
+                            Log.v("Beacon not found", "You can do your stuff here.");
+                        }
                     }
 
 //                    logToDisplay("The first beacon " + firstBeacon.toString() + " is about " + firstBeacon.getDistance() + " meters away.");
@@ -185,11 +212,46 @@ public class MyBeaconService extends Service implements BeaconConsumer {
         } catch (RemoteException e) {   }
     }
 
+    private void changeRingtone(String ringtone) {
+        File k = new File(ringtone);
+        if (ringtone != null) {      // file.exists
+
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.MediaColumns.DATA, k.getAbsolutePath());
+            values.put(MediaStore.MediaColumns.TITLE, "ring");
+            values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp3");
+            values.put(MediaStore.MediaColumns.SIZE, k.length());
+            values.put(MediaStore.Audio.Media.ARTIST, R.string.app_name);
+            values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
+            values.put(MediaStore.Audio.Media.IS_NOTIFICATION, true);
+            values.put(MediaStore.Audio.Media.IS_ALARM, false);
+            values.put(MediaStore.Audio.Media.IS_MUSIC, false);
+
+            Uri uri = MediaStore.Audio.Media.getContentUriForPath(k
+                    .getAbsolutePath());
+            context.getContentResolver().delete(
+                    uri,
+                    MediaStore.MediaColumns.DATA + "=\""
+                            + k.getAbsolutePath() + "\"", null);
+            Uri newUri = context.getContentResolver().insert(uri, values);
+
+            try {
+                RingtoneManager.setActualDefaultRingtoneUri(context
+                        , RingtoneManager.TYPE_RINGTONE,
+                        newUri);
+                Log.i("Setting Ringtone", "Ringtone setting successful " + ringtone);
+            } catch (Throwable t) {
+                Log.e("Setting Ringtone", t.toString());
+            }
+        }
+    }
+
     private void notifyUser(String name) {
+        Log.v("My Beacon Service", "Notification Sent");
         mBuilder =   new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.icon_outline) // notification icon
                 .setContentTitle("Smart Notifier!") // title for notification
-                .setContentText("Your phone setting has been changed to "+name) // message for notification
+                .setContentText("Your profile changed to "+name) // message for notification
                 .setAutoCancel(true); // clear notification after click
 
         mNotificationManager =
@@ -225,7 +287,7 @@ public class MyBeaconService extends Service implements BeaconConsumer {
                 Log.v("My Beacon Service", "Event detection successful" + beaconIds.get(i));
                 return i;
             } else {
-                Log.v("My Beacon Service", "Events detection unsuccessful" + beaconIds.get(i));
+                Log.v("My Beacon Service", "Events detection unsuccessful" + beaconIds.size());
             }
         }
         return -1;

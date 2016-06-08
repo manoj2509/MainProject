@@ -1,15 +1,19 @@
 package edu.scu.mparihar.mainproject;
 
+import android.*;
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.audiofx.BassBoost;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
 
     protected static final String TAG = "MainActivity";
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+    private static final int PERMISSION_REQUEST_WRITE_SETTINGS = 2;
     int ADD_EVENT_INTENT = 1;
     int ADD_PROFILE_INTENT = 2;
     EventData ed;
@@ -48,12 +53,12 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     AlarmManager alarmManager,alarmManager1;
     PendingIntent pendingIntent,pendingIntent1;
     static List<EventData> AllData;
-    List<ProfileData> AllProfiles;
+    static List<ProfileData> AllProfiles;
     List<String> ProfileNames;
     private TabLayout tabLayout;
     SimpleDateFormat formatter = new SimpleDateFormat("mm/dd/yy");
-    EventDbHelper eventDbHelper;
-    ProfileDbHelper profileDbHelper;
+    public static EventDbHelper eventDbHelper;
+    public static ProfileDbHelper profileDbHelper;
 
 
     private ViewPager viewPager;
@@ -96,6 +101,27 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                 });
                 builder.show();
             }
+            if (this.checkSelfPermission(Manifest.permission.WRITE_SETTINGS) != PackageManager.PERMISSION_GRANTED) {
+                if (!Settings.System.canWrite(this)) {
+                    Intent grantIntent = new   Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                    startActivity(grantIntent);
+//                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//                    builder.setTitle("This app needs Write to file Access");
+//                    builder.setMessage("Please grant Write to file access so this app can change your ringing profiles.");
+//                    builder.setPositiveButton(android.R.string.ok, null);
+//                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//
+//                        @TargetApi(23)
+//                        @Override
+//                        public void onDismiss(DialogInterface dialog) {
+//                            requestPermissions(new String[]{Manifest.permission.WRITE_SETTINGS},
+//                                    PERMISSION_REQUEST_WRITE_SETTINGS);
+//                        }
+//
+//                    });
+//                    builder.show();
+                }
+            }
         }
         // Delete past events.
         try {
@@ -137,28 +163,6 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                 }
             });
         }
-
-        // Putting tabLayout
-        TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                animateFab(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-
-        };
-
-
-
         ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -182,7 +186,6 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         assert tabLayout != null;
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setOnTabSelectedListener(onTabSelectedListener);  //To find which tab is selected.
         setupTabIcons();
     }
 
@@ -253,6 +256,25 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                     builder.show();
                 }
             }
+            break;
+            case PERMISSION_REQUEST_WRITE_SETTINGS: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "write settings permission granted");
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Functionality limited");
+                    builder.setMessage("Since write settings access has not been granted, this app will not be able to switch between different ringing profiles.");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                        }
+
+                    });
+                    builder.show();
+                }
+            }
         }
     }
 
@@ -303,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
 
                     //set the alarm for particular time
                     alarmManager.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
-                    //Toast.makeText(this, "Success" + time, Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Success" + time, Toast.LENGTH_LONG).show();
 
                     //new intent
                     // Setting the end time
@@ -391,13 +413,13 @@ public class MainActivity extends AppCompatActivity implements Serializable {
             if (!BeaconManager.getInstanceForApplication(this).checkAvailability()) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Bluetooth not enabled");
-                builder.setMessage("Please enable bluetooth in settings and restart this application.");
+                builder.setMessage("Please enable bluetooth to access beacon functionality.");
                 builder.setPositiveButton(android.R.string.ok, null);
                 builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        finish();
-                        System.exit(0);
+//                        finish();
+//                        System.exit(0);
                     }
                 });
                 builder.show();
@@ -412,8 +434,8 @@ public class MainActivity extends AppCompatActivity implements Serializable {
 
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    finish();
-                    System.exit(0);
+//                    finish();
+//                    System.exit(0);
                 }
 
             });
@@ -459,17 +481,4 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     public void uninstallApp() {
         startActivity(new Intent(Intent.ACTION_DELETE).setData(Uri.parse("package:edu.scu.mparihar.mainproject")));
     }
-
-
-
-//    public void logToDisplay(final String line) {
-//        runOnUiThread(new Runnable() {
-//            public void run() {
-//                EditText editText = (EditText)MainActivity.this
-//                        .findViewById(R.id.monitoringText);
-//                editText.append(line+"\n");
-//            }
-//        });
-//    }
-
 }

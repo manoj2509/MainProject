@@ -1,5 +1,6 @@
 package edu.scu.mparihar.mainproject;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
@@ -34,12 +35,16 @@ public class ProfileRecyclerViewAdapter extends RecyclerView.Adapter<ProfileRecy
         holder.entryName.setText(profileData1.getName());
         // TODO check conditions and print accordingly.
 
-        if (profileData1.getType().equals("Silent")) {
-            holder.entryType.setImageResource(R.drawable.ic_volume_off_50dp);
-        } else if (profileData1.getType().equals("Vibrate Mode")) {
-            holder.entryType.setImageResource(R.drawable.ic_vibration_24dp);
-        } else {
-            holder.entryType.setImageResource(R.drawable.ic_volume_up_50dp);
+        switch (profileData1.getType()) {
+            case "Silent":
+                holder.entryType.setImageResource(R.drawable.ic_volume_off_50dp);
+                break;
+            case "Vibrate Mode":
+                holder.entryType.setImageResource(R.drawable.ic_vibration_24dp);
+                break;
+            default:
+                holder.entryType.setImageResource(R.drawable.ic_volume_up_50dp);
+                break;
         }
     }
 
@@ -54,21 +59,22 @@ public class ProfileRecyclerViewAdapter extends RecyclerView.Adapter<ProfileRecy
         public TextView entryName;
         public ImageView entryType;
 
-        public MyViewHolder(View itemView) {
+        public MyViewHolder(final View itemView) {
             super(itemView);
             entryName = (TextView) itemView.findViewById(R.id.profile_list_name);
             entryType = (ImageView) itemView.findViewById(R.id.profile_list_type);
-//            itemView.setOnClickListener(new View.OnClickListener() {
-//
-////                @Override
-////                public void onClick(View v) {
-////                    int pos = getAdapterPosition();
-////
-////                    Intent intent = new Intent(itemView.getContext(), ViewActivity.class).putExtra("Position", Integer.toString(pos));
-////                    itemView.getContext().startActivity(intent);
-////
-////                }
-//            });
+            itemView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+
+                    Intent intent = new Intent(itemView.getContext(), ViewProfileActivity.class).
+                            putExtra("Position", pos);
+                    itemView.getContext().startActivity(intent);
+
+                }
+            });
         }
     }
 }
