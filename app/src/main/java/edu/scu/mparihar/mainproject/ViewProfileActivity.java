@@ -198,6 +198,16 @@ public class ViewProfileActivity extends AppCompatActivity {
 
                 }
                 if (flag == 0) {
+                    if (!MainActivity.AllProfiles.get(position).getName().equals(profileObject.getName())) {
+                        for (int i = 0; i < MainActivity.AllData.size(); i++) {
+                            if (MainActivity.AllData.get(i).getProfile().equals(MainActivity.AllProfiles.get(position).getName())) {
+                                MainActivity.eventDbHelper.updateProfileName(
+                                        MainActivity.AllData.get(i).getId(), profileObject.getName());
+                                MainActivity.AllData.get(i).setProfile(profileObject.getName());
+                                EventFragment.mRecyclerviewAdapterEvent.notifyDataSetChanged();
+                            }
+                        }
+                    }
                     MainActivity.AllProfiles.set(position, profileObject);
                     MainActivity.profileDbHelper.updateData(profileData.getId(), profileObject);
 

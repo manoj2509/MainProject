@@ -241,4 +241,13 @@ public class EventDbHelper extends SQLiteOpenHelper {
 
         db.update(TABLE_NAME, contentValues, UID + "=" + id, null);
     }
+
+    public void updateProfileName(int id, String name) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(PROFILE, name);
+
+        db.update(TABLE_NAME, contentValues, UID + "=" + id, null);
+
+    }
 }
